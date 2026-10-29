@@ -45,42 +45,47 @@ function parseCSV(text) {
   return matrix.map(values => Object.fromEntries(headers.filter(Boolean).map(key => [key, values[headers.indexOf(key)] || ''])));
 }
 function renderProjectGallery(rows) {
-  const gallery = document.querySelector('#project-gallery');
+  const container = document.querySelector('#project-gallery');
   const status = document.querySelector('#gallery-status');
-  if (!gallery || !status) return;
-  gallery.replaceChildren();
-  // Skip the sample stock images present in the old content sheet.
-  // Only show photos explicitly added as real project images.
-  const photos = rows.filter(row =>
-    row.section === 'gallery' &&
-    /^https:\/\//i.test(row.imageUrl || '') &&
-    !/images\.unsplash\.com/i.test(row.imageUrl)
-  );
-  photos.forEach(photo => {
-    const card = document.createElement('figure');
-    card.className = 'gallery-card';
-    const picture = document.createElement('img');
-    picture.loading = 'lazy';
-    picture.decoding = 'async';
-    picture.src = photo.imageUrl;
-    picture.alt = photo.title || 'All In Home Services completed project';
-    picture.onerror = () => {
-      card.remove();
-      if (!gallery.children.length) status.hidden = false;
-    };
-    const label = document.createElement('figcaption');
-    const heading = document.createElement('strong');
-    heading.textContent = photo.title || 'Recent Project';
-    label.append(heading);
-    if (photo.description) {
-      const description = document.createElement('span');
-      description.textContent = photo.description;
-      label.append(description);
-    }
-    card.append(picture, label);
-    gallery.append(card);
+  const dataTag = document.querySelector('#project-gallery-data');
+  if (!container || !status || !dataTag) return;
+  let projects = [];
+  try { projects = JSON.parse(dataTag.textContent); } catch (_) {}
+  container.replaceChildren();
+  projects.forEach(project => {
+    const card = document.createElement('article');
+    card.className = 'project-card';
+    const info = document.createElement('div');
+    info.className = 'project-copy';
+    const category = document.createElement('span');
+    category.className = 'project-category';
+    category.textContent = project.category || 'Our Work';
+    const title = document.createElement('h3');
+    title.textContent = project.title;
+    const description = document.createElement('p');
+    description.textContent = project.description;
+    info.append(category, title, description);
+    const imageGrid = document.createElement('div');
+    imageGrid.className = 'project-photo-grid';
+    project.images.forEach((src, index) => {
+      const link = document.createElement('a');
+      link.href = src;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.setAttribute('aria-label', 'View ' + project.title + ' photo ' + (index + 1));
+      const picture = document.createElement('img');
+      picture.src = src;
+      picture.alt = project.title + ' — photo ' + (index + 1);
+      picture.loading = 'lazy';
+      picture.decoding = 'async';
+      picture.onerror = () => link.remove();
+      link.append(picture);
+      imageGrid.append(link);
+    });
+    card.append(imageGrid, info);
+    container.append(card);
   });
-  status.hidden = photos.length > 0;
+  status.hidden = projects.length > 0;
 }
 
 function applyContent(rows) {

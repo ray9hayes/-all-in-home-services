@@ -14,3 +14,17 @@
 .gallery-status[hidden]{display:none}
 @media(max-width:850px){.gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.gallery-grid{grid-template-columns:1fr}.gallery-card img{height:240px}}
+
+/* Portfolio gallery of actual All In Home Services projects */
+.gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+.project-card{background:#fff;border:1px solid #e5e4e0;border-radius:14px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.045)}
+.project-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:5px;background:#f4f2ee}
+.project-photo-grid a{display:block;aspect-ratio:4/3;overflow:hidden;background:#e7e7e3}
+.project-photo-grid a:first-child:nth-last-child(1){grid-column:1/-1;aspect-ratio:16/10}
+.project-photo-grid img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .22s ease}
+.project-photo-grid a:hover img{transform:scale(1.035)}
+.project-copy{padding:20px 22px 24px}
+.project-category{display:block;color:#c05b1d;font-weight:700;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.project-copy h3{font-size:1.17rem;line-height:1.3;margin:0 0 9px}
+.project-copy p{font-size:.94rem;line-height:1.55;color:#55575d;margin:0}
+@media(max-width:760px){.gallery-grid{grid-template-columns:1fr;gap:19px}.project-copy{padding:17px 18px 21px}}
