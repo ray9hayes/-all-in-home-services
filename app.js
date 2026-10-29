@@ -44,7 +44,47 @@ function parseCSV(text) {
   if (!headers.includes('section') || !headers.includes('title')) throw new Error('Unexpected content format');
   return matrix.map(values => Object.fromEntries(headers.filter(Boolean).map(key => [key, values[headers.indexOf(key)] || ''])));
 }
+function renderProjectGallery(rows) {
+  const gallery = document.querySelector('#project-gallery');
+  const status = document.querySelector('#gallery-status');
+  if (!gallery || !status) return;
+  gallery.replaceChildren();
+  // Skip the sample stock images present in the old content sheet.
+  // Only show photos explicitly added as real project images.
+  const photos = rows.filter(row =>
+    row.section === 'gallery' &&
+    /^https:\/\//i.test(row.imageUrl || '') &&
+    !/images\.unsplash\.com/i.test(row.imageUrl)
+  );
+  photos.forEach(photo => {
+    const card = document.createElement('figure');
+    card.className = 'gallery-card';
+    const picture = document.createElement('img');
+    picture.loading = 'lazy';
+    picture.decoding = 'async';
+    picture.src = photo.imageUrl;
+    picture.alt = photo.title || 'All In Home Services completed project';
+    picture.onerror = () => {
+      card.remove();
+      if (!gallery.children.length) status.hidden = false;
+    };
+    const label = document.createElement('figcaption');
+    const heading = document.createElement('strong');
+    heading.textContent = photo.title || 'Recent Project';
+    label.append(heading);
+    if (photo.description) {
+      const description = document.createElement('span');
+      description.textContent = photo.description;
+      label.append(description);
+    }
+    card.append(picture, label);
+    gallery.append(card);
+  });
+  status.hidden = photos.length > 0;
+}
+
 function applyContent(rows) {
+  renderProjectGallery(rows);
   const text = id => rows.find(row => row.id === id && row.title)?.title;
   const phone = text('phone');
   if (phone && phone.replace(/\D/g, '').length >= 10) {
